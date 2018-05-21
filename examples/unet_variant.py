@@ -17,12 +17,13 @@ segmentation=f["volumes"]["labels"]["neuron_ids"].value
 
 affinities=affinities.get_affins(segmentation)
 
+code.interact(local=locals())
+
 
 np.savetxt("affinities.csv",affinities,delimiter=",",dtype=np.int)
 
 print("DONE")
 
-code.interact(locals())
 
 
                     ###################
