@@ -1,9 +1,6 @@
 from elektronn2 import neuromancer as nm
-import elektronn2.malis as malis
 import code
-from elektronn2.utils import h5load
 import h5py
-import affinities
 import numpy as np
                     ###################
                     #   GET  DATA    #
@@ -11,19 +8,13 @@ import numpy as np
 
 
 
-f = h5py.File("/Users/liammcgoldrick/Code/ELEKTRONN2/examples/sample_A_20160501.hdf", "r")
+f = h5py.File("sample_A_20160501.hdf", "r")
 raw_data=f["volumes"]["raw"].value
-segmentation=f["volumes"]["labels"]["neuron_ids"].value
 
-affinities=affinities.get_affins(segmentation)
-
-code.interact(local=locals())
+affinities=np.load("/home/curie/code/ELEKTRONN2/examples/affinities.npy")
 
 
-np.savetxt("affinities.csv",affinities,delimiter=",",dtype=np.int)
-
-print("DONE")
-
+print(np.shape(affinities))
 
 
                     ###################
@@ -86,5 +77,7 @@ model.designate_nodes(
 model.test_run_prediction()
 
 
+
 model.trainingstep(data= raw_data ,target= affinities ,optimiser="Adam")
+
 

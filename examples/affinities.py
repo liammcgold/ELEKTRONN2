@@ -36,5 +36,7 @@ def get_affins(arr):
 
     print("DONE")
 
+    affins=np.asarray(affins,dtype=np.int)
+
     return affins
 
