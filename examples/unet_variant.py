@@ -3,7 +3,8 @@ import elektronn2.malis as malis
 import code
 from elektronn2.utils import h5load
 import h5py
-
+import affinities
+import numpy as np
                     ###################
                     #   GET  DATA    #
                     ###################
@@ -14,10 +15,14 @@ f = h5py.File("/Users/liammcgoldrick/Code/ELEKTRONN2/examples/sample_A_20160501.
 raw_data=f["volumes"]["raw"].value
 segmentation=f["volumes"]["labels"]["neuron_ids"].value
 
-affins=get_affins(segmentation)
+affinities=affinities.get_affins(segmentation)
 
 
+np.savetxt("affinities.csv",affinities,delimiter=",",dtype=np.int)
 
+print("DONE")
+
+code.interact(locals())
 
 
                     ###################
@@ -27,7 +32,7 @@ affins=get_affins(segmentation)
 
 in_sh = (None,1,128,128,16)
 
-inp = nm.Input(in_sh, 'b,f,x,y,z', name='raw')  # high res
+inp = nm.Input(in_sh, 'b,f,z,x,y', name='raw')  # high res
 
 # Convolution, downsampling of intermediate features
 
@@ -53,9 +58,9 @@ mconv1 = nm.Conv(mrg1,8,(15,15,15),(1,1,1),"same",name="mc1")
 
 #merge mc1 and c0 and convolve
 mrg2   = nm.UpConvMerge(mconv1, conv0, 8,name="m2",merge_mode="add")
-mconv2 = nm.Conv(mrg2,6,(15,15,15),(1,1,1),"same",name="mc2")
+mconv2 = nm.Conv(mrg2,3,(15,15,15),(1,1,1),"same",name="mc2")
 
-affins=nm.Input((None,6,128,128,16), 'b,f,x,y,z', name='affins')
+affins=nm.Input((None,3,128,128,16), 'b,f,z,x,y', name='affins')
 
 loss_node = nm.loss.BinaryNLL(mconv2,affins)
 loss=nm.AggregateLoss(loss_node)
@@ -80,5 +85,5 @@ model.designate_nodes(
 model.test_run_prediction()
 
 
-#model.trainingstep(data= raw_data ,target= ,optimiser="Adam")
+model.trainingstep(data= raw_data ,target= affinities ,optimiser="Adam")
 
